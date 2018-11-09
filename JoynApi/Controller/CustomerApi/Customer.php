@@ -68,7 +68,8 @@ class Customer extends \Magento\Framework\App\Action\Action implements CsrfAware
 
                     $this->customer->create();
 
-                    } elseif ($_SERVER['REQUEST_METHOD'] == 'PUT') {
+                    }
+                } elseif ($_SERVER['REQUEST_METHOD'] == 'PUT') {
 
                     $this->customer->update();
 
@@ -84,6 +85,5 @@ class Customer extends \Magento\Framework\App\Action\Action implements CsrfAware
                 return $this->response;
             }
         }
-    }
 }
 
