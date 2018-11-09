@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="trollweb" translate="label" sortOrder="1000">
+            <label>Trollweb</label>
+        </tab>
+        <section id="trollweb" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Trollweb</label>
+            <tab>trollweb</tab>
+            <resource>Trollweb_JoynApi::trollweb</resource>
+            <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enabled" type="select" translate="label,comment,tooltip" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>trollweb/general/enabled</config_path>
+                    <comment>Helpful message about using this field.</comment>
+                    <tooltip>Longer helpful message about using this field.</tooltip>
+                </field>
+                <field id="apikey" type="text" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>ApiKey</label>
+                    <validate>required-entry alphanumeric</validate>
+                    <config_path>trollweb/general/apikey</config_path>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="partnerId" type="text" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Partner ID</label>
+                    <validate>required-entry alphanumeric</validate>
+                    <config_path>trollweb/general/partnerId</config_path>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+                <field id="secretKey" type="text" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Secret key</label>
+                    <validate>required-entry alphanumeric</validate>
+                    <config_path>trollweb/general/secretKey</config_path>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
