@@ -64,13 +64,13 @@ class Authentication
 
         $requestContent = base64_encode($requestContentMd5Hash);
         $signatureRawData = ($partnerId . $requestMethod . $requestUri . $requestTimeStamp . $nonce . $requestContent);
-        $utf8_data = utf8_encode($signatureRawData);
-        $hmac_before_base64 = hash_hmac('sha256', $utf8_data, $secretKey, true); // not raw digital output
-        $hmac_base64_encoded = base64_encode($hmac_before_base64);
-        $hmac_substringed = mb_substr($hmac_base64_encoded, 0, 10, 'UTF-8');
-        $this->authKey = "$partnerId:$hmac_substringed:$nonce:$requestTimeStamp";
-        $auth_header = "Authorization: hmac $partnerId:$hmac_substringed:$nonce:$requestTimeStamp";
-        $this->authHeader = $auth_header;
+        $utf8Data = utf8_encode($signatureRawData);
+        $hmacBeforeBase64 = hash_hmac('sha256', $utf8Data, $secretKey, true); // not raw digital output
+        $hmacBase64Encoded = base64_encode($hmacBeforeBase64);
+        $hmacSubstringed = mb_substr($hmacBase64Encoded, 0, 10, 'UTF-8');
+        $this->authKey = "$partnerId:$hmacSubstringed:$nonce:$requestTimeStamp";
+        $authHeader = "Authorization: hmac $partnerId:$hmacSubstringed:$nonce:$requestTimeStamp";
+        $this->authHeader = $authHeader;
     }
 
     public function checkAuthentication($requestAuthKey)

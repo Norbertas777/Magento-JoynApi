@@ -24,7 +24,6 @@ class Config extends Template
         $this->helper = $helper;
         parent::__construct($context);
     }
-
     /**
      * @return bool
      */

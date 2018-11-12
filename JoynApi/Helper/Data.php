@@ -23,7 +23,6 @@ class Data extends AbstractHelper
     {
         parent::__construct($context);
     }
-
     /*
      * @return bool
      */
@@ -34,7 +33,6 @@ class Data extends AbstractHelper
             $scope
         );
     }
-
     /*
      * @return string
      */
@@ -45,7 +43,6 @@ class Data extends AbstractHelper
             $scope
         );
     }
-
     /*
      * @return string
      */
@@ -56,7 +53,6 @@ class Data extends AbstractHelper
             $scope
         );
     }
-
     /*
      * @return string
      */
@@ -67,15 +63,4 @@ class Data extends AbstractHelper
             $scope
         );
     }
-
-    /*
-     * @return string
-     */
-//    public function getOption($scope = ScopeConfigInterface::SCOPE_TYPE_DEFAULT)
-//    {
-//        return $this->scopeConfig->getValue(
-//            'inviqa/general/option',
-//            $scope
-//        );
-//    }
 }

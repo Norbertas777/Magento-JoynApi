@@ -38,7 +38,7 @@ class Customer extends \Magento\Framework\App\Action\Action implements CsrfAware
         \Magento\Customer\Model\ResourceModel\Customer\CollectionFactory $collectionFactory
     )
     {
-        $this->customer = new CustomerModel($objectManager, $storeManager, $customerRepository, $customerFactory, $addressFactory, $response,$addressRepository);
+        $this->customer = new CustomerModel($objectManager, $storeManager, $customerRepository, $customerFactory, $addressFactory, $response, $addressRepository);
         $this->authentication = new Authentication($response);
         $this->helperData = new Data($contextt);
         $this->response = $response;
@@ -60,30 +60,27 @@ class Customer extends \Magento\Framework\App\Action\Action implements CsrfAware
 
     public function execute()
     {
-        if ($_SERVER['REQUEST_METHOD']) {
 //            $this->response = $this->authentication->checkAuthentication("1:UW+gQz95pt:5be40133e5a9c:1541669171");
-            if ($this->helperData->getApiKey() === $_SERVER['HTTP_API_KEY']) {
+        if ($this->helperData->getApiKey() === $_SERVER['HTTP_API_KEY']) {
 
-                if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            switch ($_SERVER['REQUEST_METHOD']){
 
+                case "POST":
                     $this->customer->create();
-
-                    }
-                } elseif ($_SERVER['REQUEST_METHOD'] == 'PUT') {
-
+                    break;
+                case "PUT":
                     $this->customer->update();
-
-                } elseif ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
-
+                    break;
+                case "DELETE":
                     $this->customer->delete();
-                }
-
-            } else {
-                $this->response->setHttpResponseCode(403);
-                $this->response->setBody("Rejected: Api-Key does not match!");
-                $this->response->setStatusHeader(403, '1.1', 'Rejected');
-                return $this->response;
+                    break;
             }
+        } else {
+            $this->response->setHttpResponseCode(403);
+            $this->response->setBody("Rejected: Api-Key does not match!");
+            $this->response->setStatusHeader(403, '1.1', 'Rejected');
+            return $this->response;
         }
+    }
 }
 

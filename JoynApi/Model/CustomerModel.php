@@ -5,7 +5,6 @@
  * Date: 18.11.6
  * Time: 10.19
  */
-
 namespace Trollweb\JoynApi\Model;
 
 use Magento\Setup\Exception;
@@ -39,8 +38,8 @@ class CustomerModel implements CustomerInterface
         $this->response = $response;
         $this->addressRepository = $addressRepository;
 
-        $store = $storeManager->getStore();
-        $storeId = $store->getStoreId();
+//        $store = $storeManager->getStore();
+//        $storeId = $store->getStoreId();
     }
 
     public function create()
@@ -48,24 +47,19 @@ class CustomerModel implements CustomerInterface
         try {
 
             $data = json_decode(file_get_contents('php://input'), true);
-
-            if ($data['data']['gender'] === 'M') {
-                $gender = 1;
-            } else {
-                $gender = 2;
-            }
-
             $customer = $this->customerFactory->create();
-
-
             $websiteId = $this->_storeManager->getWebsite()->getWebsiteId();
             $customer->setWebsiteId($websiteId);
             $customer->loadByEmail($data['data']['email']);
 
             if ($customer->getEmail()) {
-
                 throw new Exception("User with this email already exists!");
+            }
 
+            if ($data['data']['gender'] === 'M') {
+                $gender = 1;
+            } else {
+                $gender = 2;
             }
 
             $customer->setWebsiteId($websiteId)
@@ -74,12 +68,9 @@ class CustomerModel implements CustomerInterface
                 ->setLastname($data['data']['lastName'])
                 ->setGender($gender)
                 ->setDob($data['data']['birthDate']);
-
-
             $customer->save();
 
             $address = $this->addressFactory->create();
-
             $address->setCustomerId($customer->getId())
                 ->setFirstname($data['data']['firstName'])
                 ->setLastname($data['data']['lastName'])
@@ -91,8 +82,6 @@ class CustomerModel implements CustomerInterface
                 ->setIsDefaultBilling('1')
                 ->setIsDefaultShipping('1')
                 ->setSaveInAddressBook('1');
-
-
             $address->save();
 
             $this->response->setHttpResponseCode(201);
@@ -101,7 +90,6 @@ class CustomerModel implements CustomerInterface
             return $customer->getId();
 
         } catch (Exception $e) {
-
             $this->response->setHttpResponseCode(409);
             $this->response->setBody("User with this email already exists!");
             $this->response->setStatusHeader(409, '1.1', 'Error');
@@ -110,110 +98,104 @@ class CustomerModel implements CustomerInterface
 
     public function update()
     {
-
         try {
 
-            $queries = $_SERVER['REQUEST_URI'];
-            $sanitize = preg_replace('/[?&=]/', '/', $queries);
-            $urlArray = explode('/', $sanitize);
+            $url = $_SERVER['REQUEST_URI'];
+            $urlArrayInParts = explode('/', $url);
+            $inputData = json_decode(file_get_contents('php://input'), true);
 
-            $data = json_decode(file_get_contents('php://input'), true);
+            if (!$this->customerRepository->getById($urlArrayInParts[5])) {
+                throw new \Exception ("User with this id does not exists!");
+            } else {
+                $customerData = $this->customerRepository->getById($urlArrayInParts[5]);
+            }
 
-            $street[] = $data['data']['streetAddress'];
-
-            if ($data['data']['gender'] === 'M') {
+            if ($inputData['data']['gender'] === 'M') {
                 $gender = 1;
             } else {
                 $gender = 2;
             }
 
-            if (!$this->customerRepository->getById($urlArray[5])) {
+            $addressId = $customerData->getDefaultBilling();
+            $street[] = $inputData['data']['streetAddress'];
 
-                throw new \Exception("User with this id does not exists!");
+            if (isset($inputData['data']['firstName'])) {
 
-            } else {
-                $getData = $this->customerRepository->getById($urlArray[5]);
-            }
-
-            $adressId = $getData->getDefaultBilling();
-
-            if (isset($data['data']['firstName'])) {
-
-                $customer = $this->customerRepository->getById($urlArray[5]);
-                $customer->setFirstname($data['data']['firstName']);
+                $customer = $this->customerRepository->getById($urlArrayInParts[5]);
+                $customer->setFirstname($inputData['data']['firstName']);
                 $this->customerRepository->save($customer);
 
-                $address = $this->addressRepository->getById($adressId);
-                $address->setFirstname($data['data']['firstName']);
+                $address = $this->addressRepository->getById($addressId);
+                $address->setFirstname($inputData['data']['firstName']);
                 $this->addressRepository->save($address);
             }
 
-            if (isset($data['data']['lastName'])) {
+            if (isset($inputData['data']['lastName'])) {
 
-                $customer = $this->customerRepository->getById($urlArray[5]);
-                $customer->setLastname($data['data']['lastName']);
+                $customer = $this->customerRepository->getById($urlArrayInParts[5]);
+                $customer->setLastname($inputData['data']['lastName']);
                 $this->customerRepository->save($customer);
 
-                $address = $this->addressRepository->getById($adressId);
-                $address->setLastname($data['data']['lastName']);
+                $address = $this->addressRepository->getById($addressId);
+                $address->setLastname($inputData['data']['lastName']);
                 $this->addressRepository->save($address);
             }
 
-            if (isset($data['data']['birthDate'])) {
+            if (isset($inputData['data']['birthDate'])) {
 
-                $customer = $this->customerRepository->getById($urlArray[5]);
-                $customer->setDob($data['data']['birthDate']);
+                $customer = $this->customerRepository->getById($urlArrayInParts[5]);
+                $customer->setDob($inputData['data']['birthDate']);
                 $this->customerRepository->save($customer);
             }
 
-            if (isset($data['data']['email'])) {
+            if (isset($inputData['data']['email'])) {
 
-                $customer = $this->customerRepository->getById($urlArray[5]);
-                $customer->setEmail($data['data']['email']);
+                $customer = $this->customerRepository->getById($urlArrayInParts[5]);
+                $customer->setEmail($inputData['data']['email']);
                 $this->customerRepository->save($customer);
             }
 
-            if (isset($data['data']['gender'])) {
+            if (isset($inputData['data']['gender'])) {
 
-                $customer = $this->customerRepository->getById($urlArray[5]);
+                $customer = $this->customerRepository->getById($urlArrayInParts[5]);
                 $customer->setGender($gender);
                 $this->customerRepository->save($customer);
             }
 
-            if (isset($data['data']['zipCode'])) {
+            if (isset($inputData['data']['zipCode'])) {
 
-                $address = $this->addressRepository->getById($adressId);
-                $address->setPostcode($data['data']['zipCode'])
+                $address = $this->addressRepository->getById($addressId);
+                $address->setPostcode($inputData['data']['zipCode'])
                     ->setCountryId('NO')
                     ->setIsDefaultBilling('1')
                     ->setIsDefaultShipping('1');
                 $this->addressRepository->save($address);
             }
 
-            if (isset($data['data']['city'])) {
+            if (isset($inputData['data']['city'])) {
 
-                $address = $this->addressRepository->getById($adressId);
-                $address->setCity($data['data']['city'])
+                $address = $this->addressRepository->getById($addressId);
+                $address->setCity($inputData['data']['city'])
                     ->setCountryId('NO')
                     ->setIsDefaultBilling('1')
                     ->setIsDefaultShipping('1');
                 $this->addressRepository->save($address);
             }
 
-            if (isset($data['data']['msisdn'])) {
+            if (isset($inputData['data']['msisdn'])) {
 
 
-                $address = $this->addressRepository->getById($adressId);
-                $address->setTelephone($data['data']['msisdn'])
+                $address = $this->addressRepository->getById($addressId);
+                $address->setTelephone($inputData['data']['msisdn'])
                     ->setCountryId('NO')
                     ->setIsDefaultBilling('1')
                     ->setIsDefaultShipping('1');
                 $this->addressRepository->save($address);
             }
 
-            if (isset($data['data']['streetAddress'])) {
+            if (isset($inputData['data']['streetAddress'])) {
 
-                $address = $this->addressRepository->getById($adressId);
+                $address = $this->addressRepository->getById($addressId);
                 $address->setStreet($street)
                     ->setCountryId('NO')
                     ->setIsDefaultBilling('1')
@@ -222,14 +204,14 @@ class CustomerModel implements CustomerInterface
             }
 
             $this->response->setHttpResponseCode(200);
-            $this->response->setBody($urlArray[5]);
+            $this->response->setBody($urlArrayInParts[5]);
             $this->response->setStatusHeader(200, '1.1', 'User updated successfully');
-            return $urlArray[5];
+            return $urlArrayInParts[5];
 
         } catch (\Exception $e) {
 
             $this->response->setHttpResponseCode(409);
-            $this->response->setBody("User with this id does not exists!");
+            $this->response->setBody('User with this id does not exist!');
             $this->response->setStatusHeader(409, '1.1', 'Error');
         }
     }
